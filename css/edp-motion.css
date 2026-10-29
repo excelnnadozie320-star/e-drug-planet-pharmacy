@@ -1,0 +1,203 @@
+/* =====================================================================
+   E-Drug Planet Pharmacy — Motion layer · edp-motion.css · v1.0
+   Load AFTER the site's main stylesheet (it relies on the same
+   --green / --green2 / --lime / --surface… tokens and on
+   :root[data-theme="dark"], so light + dark both work automatically).
+
+   Sections
+   0  Tokens + base            5  Category / product / branch cards
+   1  Hero entrance           6  Buttons + micro-interactions
+   2  Emblem depth            7  Navigation + header
+   3  Pointer / touch layers  8  Lite mode, reduced motion, print
+   4  Scroll reveals
+   Only transform / opacity / clip-path / translate / scale / rotate
+   are animated, so nothing here causes layout shift.
+   ===================================================================== */
+
+/* 0 · Tokens + base ------------------------------------------------- */
+:root{
+  --edp-ease:cubic-bezier(.22,.8,.24,1);
+  --edp-spring:cubic-bezier(.34,1.56,.64,1);
+  --edp-glow:color-mix(in srgb,var(--green2) 22%,transparent);
+  --edp-glow-strong:color-mix(in srgb,var(--green2) 36%,transparent);
+  --edp-sheen:rgba(255,255,255,.55);
+}
+:root[data-theme="dark"]{--edp-glow:color-mix(in srgb,var(--green2) 20%,transparent);--edp-sheen:rgba(198,243,106,.16)}
+a,button{-webkit-tap-highlight-color:color-mix(in srgb,var(--green2) 16%,transparent)}
+a:focus-visible,button:focus-visible{outline:3px solid color-mix(in srgb,var(--green2) 80%,transparent);outline-offset:3px}
+
+@keyframes edp-rise{from{opacity:0;transform:translateY(22px)}}
+@keyframes edp-spin{to{rotate:360deg}}
+
+/* 1 · Hero entrance (the one orchestrated moment) -------------------
+   Keyframes only define a `from` state with backwards fill, so if an
+   animation never runs the content is simply visible. */
+.hero-copy>*{animation:edp-rise .8s var(--edp-ease) backwards}
+.hero-copy>.eyebrow{animation-delay:.04s}
+.hero-copy>h1{animation-delay:.1s}
+.hero-copy>.lead{animation-delay:.4s}
+.hero-copy>.hero-actions{animation-delay:.52s}
+.hero-copy>.trust-row{animation-delay:.64s}
+.hero-copy>h1.edp-split{animation:none}              /* lines animate instead */
+.edp-line{display:block;clip-path:inset(-.1em -.05em -.2em -.05em)}   /* clips the slide-up without touching layout */
+.edp-line>span{display:block;animation:edp-line .9s var(--edp-ease) backwards;animation-delay:calc(.1s + var(--l,0)*.1s)}
+@keyframes edp-line{from{transform:translateY(135%)}}
+
+.hero-art{animation:edp-art-in 1s var(--edp-ease) .08s backwards}
+@keyframes edp-art-in{from{opacity:0;scale:.965}}
+@supports (animation-timeline:scroll()){
+  .hero-art{animation:edp-art-in 1s var(--edp-ease) .08s backwards,edp-art-drift linear both;animation-timeline:auto,scroll(root block);animation-range:normal,0 600px}
+  @keyframes edp-art-drift{to{translate:0 -24px}}
+}
+
+/* 2 · Emblem depth ------------------------------------------------- */
+.hero-art::before{content:"";position:absolute;inset:0;pointer-events:none;
+  background-image:radial-gradient(color-mix(in srgb,var(--green) 30%,transparent) 1px,transparent 1.5px);background-size:22px 22px;
+  -webkit-mask-image:radial-gradient(circle at 50% 55%,#000 12%,transparent 68%);mask-image:radial-gradient(circle at 50% 55%,#000 12%,transparent 68%);opacity:.6}
+.hero-art::after{content:"";position:absolute;left:0;top:0;width:340px;height:340px;margin:-170px 0 0 -170px;border-radius:50%;pointer-events:none;z-index:1;
+  background:radial-gradient(circle,var(--edp-sheen) 0,transparent 62%);opacity:0;translate:var(--mx,50%) var(--my,50%);transition:opacity .4s,translate .16s ease-out}
+.hero-art.is-tilting::after,.hero-art.is-pressed::after{opacity:1}
+
+.hero-art .orb{
+  background:radial-gradient(circle at 31% 21%,rgba(255,255,255,.55) 0,rgba(255,255,255,0) 22%),radial-gradient(circle at 30% 25%,#a8f0be,#13975b 58%,#07512f);
+  box-shadow:inset -25px -25px 50px #00391f55,inset 10px 10px 30px rgba(255,255,255,.16),inset 0 0 0 1px rgba(198,243,106,.28),0 25px 65px #08744338,0 60px 60px -34px rgba(0,60,30,.3);
+  animation:edp-orb-in 1s var(--edp-spring) .2s backwards,float 6s ease-in-out infinite}
+.hero-art .orb::before{animation:edp-ring-in .9s var(--edp-ease) .5s backwards}
+.hero-art .orb::after{animation:edp-ring-in .9s var(--edp-ease) .65s backwards}
+@keyframes edp-orb-in{from{opacity:0;scale:.55}}
+@keyframes edp-ring-in{from{opacity:0;scale:.6}}
+/* Extruded cross: stacked hard shadows give a solid 3-D slab with no extra element */
+.hero-art .cross{
+  text-shadow:0 1px 0 #e9fff1,0 2px 0 #c4f0d4,0 3px 0 #9ddcb5,0 4px 0 #6fc08f,0 5px 0 #3f9f6a,0 6px 0 #2a8556,0 7px 0 #1b6b43,0 16px 24px rgba(0,50,28,.5);
+  animation:edp-cross-in .85s var(--edp-spring) .55s backwards}
+@keyframes edp-cross-in{from{opacity:0;scale:.4;rotate:-40deg}}
+.hero-art .fc-one{animation:edp-card-in .7s var(--edp-ease) .8s backwards,float 5s ease-in-out infinite}
+.hero-art .fc-two{animation:edp-card-in .7s var(--edp-ease) 1s backwards,float 5s -2s ease-in-out infinite}
+@keyframes edp-card-in{from{opacity:0;scale:.9}}
+.hero-art.is-paused,.hero-art.is-paused *,.hero-art.is-paused *::before,.hero-art.is-paused *::after{animation-play-state:paused!important}
+
+/* Orbit ring + satellite (injected by JS, full mode only) */
+.edp-orbit{display:none;position:absolute;inset:0;margin:auto;--s:clamp(240px,42vw,360px);width:var(--s);height:var(--s);border-radius:50%;pointer-events:none;z-index:1;animation:edp-spin 24s linear infinite}
+.edp-mode-full .edp-orbit{display:block}
+.edp-orbit::before{content:"";position:absolute;inset:0;border-radius:50%;border:1px solid color-mix(in srgb,var(--lime) 60%,transparent);
+  -webkit-mask-image:conic-gradient(from 0deg,transparent 35%,#000 100%);mask-image:conic-gradient(from 0deg,transparent 35%,#000 100%)}
+.edp-orbit i{position:absolute;left:50%;top:-4px;width:9px;height:9px;margin-left:-4.5px;border-radius:50%;background:var(--lime);box-shadow:0 0 0 4px color-mix(in srgb,var(--lime) 24%,transparent),0 0 16px var(--lime)}
+
+/* 3 · Pointer / touch layers (fine pointers only; touch gets press feedback) */
+.edp-mode-full .hero-art :is(.orb,.floating-card){translate:calc(var(--px,0)*var(--d,-12)*1px) calc(var(--py,0)*var(--d,-12)*1px);transition:translate .7s var(--edp-ease)}
+.edp-mode-full .hero-art .fc-one{--d:18}
+.edp-mode-full .hero-art .fc-two{--d:-22}
+.edp-mode-full .hero-art .cross{transform:perspective(700px) rotateX(calc(var(--py,0)*-9deg)) rotateY(calc(var(--px,0)*12deg));transition:transform .7s var(--edp-ease)}
+.edp-mode-full .hero-art.is-tilting :is(.orb,.floating-card,.cross){transition-duration:.14s;transition-timing-function:linear}
+
+/* 4 · Scroll reveals ----------------------------------------------- */
+.reveal{opacity:1;transform:none;transition:transform .35s var(--edp-ease),border-color .25s,box-shadow .3s}   /* neutralises prototype's hidden default */
+.edp-js .reveal:not(.visible){opacity:0}
+.edp-js .reveal.visible{animation:edp-rise .72s var(--edp-d,0s) var(--edp-ease) backwards}
+.edp-js .category.visible{animation-name:edp-pop}
+.edp-js .product.visible{animation-name:edp-card}
+.edp-js .branch.visible:nth-child(odd){animation-name:edp-from-left}
+.edp-js .branch.visible:nth-child(even){animation-name:edp-from-right}
+.edp-js .order-card.visible{animation-name:edp-pop}
+@keyframes edp-pop{from{opacity:0;transform:translateY(20px) scale(.96)}}
+@keyframes edp-card{from{opacity:0;transform:perspective(800px) translateY(26px) rotateX(9deg)}}
+@keyframes edp-from-left{from{opacity:0;transform:translateX(-26px)}}
+@keyframes edp-from-right{from{opacity:0;transform:translateX(26px)}}
+.edp-js .section-head.visible h2{animation:edp-wipe .9s calc(var(--edp-d,0s) + .08s) var(--edp-ease) backwards}
+@keyframes edp-wipe{from{clip-path:inset(-8% 100% -12% 0);transform:translateX(-10px)}to{clip-path:inset(-8% -2% -12% 0)}}
+
+/* 5 · Cards ---------------------------------------------------------- */
+/* categories + branches: moving spotlight */
+.category,.branch{position:relative;isolation:isolate}
+.category::before,.branch::before{content:"";position:absolute;inset:0;border-radius:inherit;z-index:-1;pointer-events:none;opacity:0;transition:opacity .3s;
+  background:radial-gradient(200px circle at var(--mx,50%) var(--my,30%),var(--edp-glow),transparent 70%)}
+.category.is-tilting::before,.category.is-pressed::before,.category:focus-visible::before,.branch.is-tilting::before{opacity:1}
+.category{transition:transform .35s var(--edp-ease),border-color .25s,box-shadow .3s}
+.category:hover,.category:focus-visible{transform:translateY(-5px)}
+.category:active,.category.is-pressed{transform:scale(.975)}
+.cat-icon{transition:transform .45s var(--edp-spring),background .25s}
+.category:hover .cat-icon,.category:focus-visible .cat-icon{transform:translateY(-2px) rotate(-7deg) scale(1.1);background:color-mix(in srgb,var(--green2) 18%,var(--surface2))}
+
+/* products: perspective tilt + glare + parallax visual */
+.product{position:relative;transform-style:preserve-3d;
+  transform:perspective(900px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) translateY(var(--lift,0px));
+  transition:transform .55s var(--edp-ease),box-shadow .3s,border-color .3s}
+.product:hover,.product:focus-within{--lift:-4px;border-color:color-mix(in srgb,var(--green2) 55%,var(--line))}
+.product.is-tilting{--lift:-6px;transition:transform .09s linear,box-shadow .3s,border-color .3s}
+.product.is-pressed{transform:perspective(900px) scale(.975)}
+.product::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;opacity:0;transition:opacity .3s;
+  background:radial-gradient(260px circle at var(--mx,50%) var(--my,0%),var(--edp-glow),transparent 62%)}
+.product.is-tilting::after,.product.is-pressed::after{opacity:1}
+.product-visual{overflow:hidden;transition:transform .5s var(--edp-ease)}
+.product.is-tilting .product-visual{transform:translateZ(22px)}
+.product-visual::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(105deg,transparent 38%,var(--edp-sheen) 50%,transparent 62%);transform:translateX(-130%);transition:transform .8s var(--edp-ease)}
+.product:hover .product-visual::after{transform:translateX(130%)}
+.product-visual .tag{z-index:2}
+
+/* 6 · Buttons + micro-interactions -------------------------------- */
+.btn{position:relative;overflow:hidden;isolation:isolate;transition:transform .25s var(--edp-ease),box-shadow .25s,background .25s,border-color .25s}
+.btn:active{transform:translateY(0) scale(.97)}
+.btn::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(105deg,transparent 35%,var(--edp-btn-sheen,rgba(255,255,255,.28)) 50%,transparent 65%);transform:translateX(-130%);transition:transform .7s var(--edp-ease)}
+.btn:hover::before{transform:translateX(130%)}
+.btn-soft{--edp-btn-sheen:var(--edp-glow)}
+.btn-soft:hover{border-color:var(--green2)}
+.order-card .btn{--edp-btn-sheen:rgba(8,116,67,.18)}
+.edp-ripple{position:absolute;z-index:-1;border-radius:50%;background:currentColor;opacity:.16;pointer-events:none;transform:scale(0);animation:edp-ripple .6s var(--edp-ease) forwards}
+@keyframes edp-ripple{to{transform:scale(1);opacity:0}}
+
+.brand-mark{transition:transform .5s var(--edp-spring)}
+.brand:hover .brand-mark,.brand:focus-visible .brand-mark{transform:rotate(90deg) scale(1.07)}
+.theme-btn,.menu-btn{transition:transform .35s var(--edp-spring),border-color .2s,background .2s}
+.theme-btn:hover{transform:rotate(18deg);border-color:var(--green2)}
+.menu-btn:hover{border-color:var(--green2)}
+.theme-btn:active,.menu-btn:active{transform:scale(.92)}
+.theme-btn.is-spinning{animation:edp-theme-spin .6s var(--edp-ease)}
+@keyframes edp-theme-spin{to{transform:rotate(360deg)}}
+.edp-wash{position:fixed;inset:0;z-index:50;pointer-events:none;background:radial-gradient(circle at var(--x,50%) var(--y,0%),var(--edp-glow-strong),transparent 55%);animation:edp-wash .7s ease-out forwards}
+@keyframes edp-wash{0%{opacity:0}25%{opacity:1}100%{opacity:0}}
+
+/* order band: one-time light sweep + ring bloom */
+.order-card::before{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(105deg,transparent 30%,rgba(255,255,255,.14) 50%,transparent 70%);transform:translateX(-110%)}
+.edp-js .order-card.visible::before{animation:edp-sweep 1.4s .5s var(--edp-ease) both}
+@keyframes edp-sweep{to{transform:translateX(110%)}}
+.edp-js .order-card.visible::after{animation:edp-ring 1.2s .3s var(--edp-ease) backwards}
+@keyframes edp-ring{from{opacity:0;scale:.5}}
+
+/* 7 · Navigation + header ------------------------------------------ */
+.navlinks a{position:relative;padding:6px 0;transition:color .2s}
+.navlinks a::after{content:"";position:absolute;left:0;right:0;bottom:-2px;height:2px;border-radius:2px;background:linear-gradient(90deg,var(--green2),var(--lime));transform:scaleX(0);transform-origin:left;transition:transform .35s var(--edp-ease)}
+.navlinks a:hover::after,.navlinks a:focus-visible::after,.navlinks a.is-active::after{transform:scaleX(1)}
+.navlinks a.is-active{color:var(--green)}
+header{transition:box-shadow .3s,background .3s}
+header.is-scrolled{box-shadow:0 8px 26px -14px rgba(0,0,0,.28)}
+@supports (animation-timeline:scroll()){   /* scroll progress line, zero JS */
+  header::after{content:"";position:absolute;left:0;bottom:-1px;width:100%;height:2px;background:linear-gradient(90deg,var(--green2),var(--lime));transform:scaleX(0);transform-origin:left;animation:edp-progress linear both;animation-timeline:scroll(root block)}
+  @keyframes edp-progress{to{transform:scaleX(1)}}
+}
+@media(max-width:680px){
+  header{backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+  .navlinks a{width:100%;padding:12px 0}                 /* ≥44px tap targets */
+  .navlinks a::after{bottom:4px}
+  .navlinks.open{animation:edp-menu .24s var(--edp-ease)}
+  .navlinks.open a{animation:edp-menu-item .3s var(--edp-ease) backwards}
+  .navlinks.open a:nth-child(2){animation-delay:.04s}.navlinks.open a:nth-child(3){animation-delay:.08s}.navlinks.open a:nth-child(4){animation-delay:.12s}
+}
+@keyframes edp-menu{from{opacity:0;transform:translateY(-8px)}}
+@keyframes edp-menu-item{from{opacity:0;transform:translateX(-10px)}}
+
+/* 8 · Lite mode (Save-Data / low-memory devices), reduced motion, print */
+.edp-mode-lite .hero-art :is(.orb,.floating-card){animation-iteration-count:1}   /* float once, then rest */
+.edp-mode-lite .edp-orbit{display:none}
+.edp-mode-lite .hero-art{animation:edp-art-in .6s var(--edp-ease) backwards;animation-timeline:auto}
+
+.edp-mode-off *,.edp-mode-off *::before,.edp-mode-off *::after{animation:none!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
+.edp-mode-off .reveal{opacity:1!important;transform:none!important}
+.edp-mode-off :is(.product,.category,.btn,.cross,.orb,.floating-card,.theme-btn,.brand-mark){transform:none!important;translate:none!important}
+.edp-mode-off .edp-orbit,.edp-mode-off .edp-wash{display:none}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
+  .reveal{opacity:1!important;transform:none!important}
+  :is(.product,.category,.btn,.cross,.orb,.floating-card,.theme-btn,.brand-mark){transform:none!important;translate:none!important}
+  .edp-orbit,.edp-wash{display:none}
+}
+@media print{.reveal{opacity:1!important;transform:none!important;animation:none!important}.edp-orbit,.edp-wash{display:none}}

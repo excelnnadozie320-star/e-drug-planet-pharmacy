@@ -1,0 +1,144 @@
+/* =====================================================================
+   E-Drug Planet Pharmacy — Premium layer · edp-premium.css · v1.0
+   Load AFTER css/edp-motion.css. Uses only existing theme tokens, so
+   light + dark work automatically.
+   1 Skip link / focus   4 Toasts + dialog   7 Footer
+   2 Hero stage + 3D     5 Catalogue states
+   3 (capsule, Spline)   6 Branches
+   ===================================================================== */
+
+/* 1 · Skip link + focus -------------------------------------------- */
+.skip-link{position:fixed;left:12px;top:-60px;z-index:100;background:var(--green);color:#fff;padding:12px 16px;border-radius:12px;font-weight:800;font-size:13px;transition:top .2s}
+.skip-link:focus{top:12px}
+main:focus{outline:none}
+
+/* 2 · Hero stage: real photos + brand emblem as one carousel --------- */
+.hero-art{min-height:clamp(360px,44vw,560px);touch-action:pan-y;background:linear-gradient(145deg,var(--hero),var(--surface))}
+.hero-slides{position:absolute;inset:0;z-index:0}
+.hero-slide{position:absolute;inset:0;margin:0;opacity:0;visibility:hidden;transition:opacity .9s var(--edp-ease,ease),visibility 0s .9s;display:grid;place-items:center}
+.hero-slide.is-active{opacity:1;visibility:visible;transition:opacity .9s var(--edp-ease,ease),visibility 0s}
+.hero-slide picture,.hero-slide img{display:block;width:100%;height:100%}
+.hero-slide img{object-fit:cover;object-position:50% 38%}
+.hero-slide:nth-child(2) img{object-position:50% 45%}
+.hero-slide:not(.hero-slide--emblem)::after{content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(180deg,color-mix(in srgb,#04281a 28%,transparent),transparent 30%,transparent 55%,color-mix(in srgb,#04281a 72%,transparent))}
+.hero-slide figcaption{position:absolute;left:18px;bottom:62px;z-index:2;color:#fff;font-size:11px;font-weight:750;letter-spacing:.2px;padding:6px 11px;border-radius:99px;background:color-mix(in srgb,#04281a 62%,transparent);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.hero-slide--emblem{background:radial-gradient(circle at 50% 45%,color-mix(in srgb,var(--green2) 18%,transparent),transparent 62%),linear-gradient(145deg,var(--hero),var(--surface))}
+.edp-mode-full .hero-slide.is-active img{animation:edp-kenburns 10s var(--edp-ease,ease-out) both}
+@keyframes edp-kenburns{from{scale:1.09}to{scale:1}}
+.hero-art:not([data-slide="2"]) .edp-orbit{opacity:0}
+.edp-orbit{transition:opacity .6s}
+
+.hero-controls{position:absolute;left:14px;right:14px;bottom:14px;z-index:4;display:flex;align-items:center;gap:8px}
+.hero-dot{width:34px;height:34px;display:grid;place-items:center;border:0;background:none;padding:0;cursor:pointer;border-radius:50%}
+.hero-dot::before{content:"";width:26px;height:5px;border-radius:5px;background:rgba(255,255,255,.55);box-shadow:0 0 0 1px rgba(4,40,26,.25);transition:background .3s,width .35s var(--edp-ease,ease)}
+.hero-dot[aria-current="true"]::before{background:var(--lime);width:38px}
+.hero-dot{width:auto;min-width:44px;height:44px}              /* 44px touch target, thin visible bar */
+.hero-pause{margin-left:auto;width:44px;height:44px;border-radius:50%;border:1px solid rgba(255,255,255,.4);background:color-mix(in srgb,#04281a 60%,transparent);color:#fff;font-size:13px;display:grid;place-items:center;cursor:pointer;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.hero-pause:hover{background:color-mix(in srgb,#04281a 80%,transparent)}
+
+/* 3D-inspired capsule: layered CSS with cylindrical shading, turns with the pointer */
+.hero-capsule{position:absolute;right:11%;top:15%;z-index:2;width:128px;height:56px;pointer-events:none;
+  translate:calc(var(--px,0)*-18px) calc(var(--py,0)*-14px);transition:translate .7s var(--edp-ease,ease)}
+.capsule{position:relative;width:100%;height:100%;border-radius:99px;transform:perspective(520px) rotateZ(-26deg) rotateY(calc(var(--px,0)*28deg));transform-style:preserve-3d;filter:drop-shadow(0 16px 14px rgba(3,40,24,.38))}
+.capsule i{position:absolute;top:0;bottom:0;width:50%}
+.capsule .c1{left:0;border-radius:99px 0 0 99px;background:linear-gradient(180deg,rgba(255,255,255,.5),rgba(255,255,255,0) 34%,rgba(0,40,20,.32)),linear-gradient(90deg,#0f9e58,#0a7a46)}
+.capsule .c2{right:0;border-radius:0 99px 99px 0;background:linear-gradient(180deg,rgba(255,255,255,.9),rgba(255,255,255,.2) 34%,rgba(40,70,55,.3)),linear-gradient(90deg,#f1fbf4,#cfe7d7)}
+.capsule::after{content:"";position:absolute;left:11%;top:12%;width:46%;height:14%;border-radius:99px;background:rgba(255,255,255,.7);transform:rotate(-2deg)}
+.edp-mode-full .capsule{animation:edp-capsule-turn 7s ease-in-out infinite alternate}
+@keyframes edp-capsule-turn{from{transform:perspective(520px) rotateZ(-26deg) rotateY(-24deg)}to{transform:perspective(520px) rotateZ(-20deg) rotateY(24deg)}}
+.hero-art.has-spline .hero-capsule{display:none}
+.hero-spline{position:absolute;inset:0;z-index:2;display:none}
+.hero-art.has-spline .hero-spline{display:block}
+.hero-spline spline-viewer{width:100%;height:100%}
+@media(max-width:680px){.hero-capsule{width:92px;height:40px;right:8%;top:20%}.hero-art{min-height:clamp(340px,92vw,420px)}.hero-slide figcaption{bottom:58px}}
+
+/* 4 · Toasts + product dialog ---------------------------------------- */
+.toast-region{position:fixed;left:50%;bottom:78px;z-index:60;translate:-50% 0;display:grid;gap:8px;width:min(92vw,380px);pointer-events:none}
+.toast{pointer-events:auto;display:flex;align-items:center;gap:12px;background:var(--surface);color:var(--text);border:1px solid var(--line);border-left:4px solid var(--green2);border-radius:14px;padding:12px 14px;font-size:13px;font-weight:650;box-shadow:var(--shadow);animation:edp-toast .3s var(--edp-ease,ease) backwards}
+.toast button{margin-left:auto;border:0;background:none;color:var(--green);font-weight:850;font-size:12px;padding:8px;min-height:36px;border-radius:8px}
+.toast.is-leaving{opacity:0;translate:0 8px;transition:opacity .25s,translate .25s}
+@keyframes edp-toast{from{opacity:0;translate:0 12px}}
+
+dialog.product-dialog{width:min(92vw,520px);max-height:88vh;overflow:auto;border:1px solid var(--line);border-radius:24px;padding:0;background:var(--surface);color:var(--text);box-shadow:0 30px 80px rgba(0,30,15,.35)}
+dialog.product-dialog::backdrop{background:rgba(3,25,15,.55);backdrop-filter:blur(3px)}
+dialog[open].product-dialog{animation:edp-dialog .28s var(--edp-ease,ease)}
+@keyframes edp-dialog{from{opacity:0;transform:translateY(16px) scale(.97)}}
+.pd-visual{height:150px;display:grid;place-items:center;font-size:64px;background:linear-gradient(145deg,var(--surface2),var(--hero));overflow:hidden}
+.pd-visual img{width:100%;height:100%;object-fit:cover}
+.pd-body{padding:22px 24px 24px}
+.pd-body h3{margin:6px 0 8px;font-size:22px;letter-spacing:-.6px}
+.pd-body p{color:var(--muted);font-size:14px;line-height:1.7;margin:0 0 12px}
+.pd-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.pd-actions .btn{flex:1;min-width:150px}
+.pd-close{position:absolute;top:10px;right:10px;width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--text);font-size:18px;display:grid;place-items:center;z-index:2}
+
+/* 5 · Catalogue: status, empty, skeleton, cart list ------------------- */
+.catalog-status{font-size:12px;color:var(--muted);margin:-8px 0 16px;min-height:1.4em}
+.catalog-empty{border:1px dashed var(--line);border-radius:20px;padding:30px;text-align:center;color:var(--muted);background:var(--surface)}
+.catalog-empty strong{display:block;color:var(--text);margin-bottom:6px;font-size:15px}
+.catalog-empty .btn{margin-top:14px}
+.product[hidden]{display:none}
+.product .details-btn{background:none;border:0;padding:6px 0;margin:0 0 10px;color:var(--green);font-weight:800;font-size:12px;text-decoration:underline;text-underline-offset:3px;min-height:36px}
+.product-visual img{width:100%;height:100%;object-fit:cover;border-radius:15px}
+.skeleton{position:relative;overflow:hidden;border-radius:20px;height:300px;background:var(--surface);border:1px solid var(--line)}
+.skeleton::after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 30%,color-mix(in srgb,var(--green2) 12%,transparent) 50%,transparent 70%);animation:edp-skel 1.3s infinite}
+@keyframes edp-skel{from{transform:translateX(-100%)}to{transform:translateX(100%)}}
+.price-live{font-weight:850;color:var(--text);font-size:15px;margin:0 0 4px}
+.rx-flag{display:inline-block;margin:0 0 10px;font-size:11px;font-weight:800;color:#8a5a00;background:color-mix(in srgb,#f5c65e 22%,var(--surface));border:1px solid color-mix(in srgb,#c98b17 38%,var(--line));border-radius:99px;padding:5px 9px}
+.cart-list{list-style:none;margin:10px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:8px}
+.cart-list li{display:inline-flex;align-items:center;gap:6px;background:var(--surface2);border:1px solid var(--line);border-radius:99px;padding:4px 4px 4px 12px;font-size:12px;font-weight:650;color:var(--text);animation:edp-chip .3s var(--edp-spring,ease) backwards}
+.cart-list button{width:32px;height:32px;border-radius:50%;border:0;background:var(--surface);color:var(--muted);font-size:15px;display:grid;place-items:center}
+.cart-list button:hover{color:#b3261e}
+@keyframes edp-chip{from{opacity:0;scale:.8}}
+.cart-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.cart-actions .btn{min-width:150px}
+.cart-message{font-size:12px;margin-top:10px;min-height:1.4em;color:var(--muted)}
+.cart-message.is-error{color:#b3261e;font-weight:700}
+.status-pill.is-bump{animation:edp-bump .4s var(--edp-spring,ease)}
+@keyframes edp-bump{50%{transform:scale(1.25)}}
+.add-enquiry[aria-pressed="true"]{background:var(--surface2);color:var(--green);border-color:var(--green2);box-shadow:none}
+.catalog-tools input:focus-visible,.catalog-tools select:focus-visible{outline:3px solid color-mix(in srgb,var(--green2) 80%,transparent);outline-offset:2px;border-color:var(--green2)}
+.catalog-tools input{transition:border-color .2s,box-shadow .25s}
+.catalog-tools input:focus{box-shadow:0 8px 24px -10px color-mix(in srgb,var(--green2) 60%,transparent)}
+
+/* 6 · Branches --------------------------------------------------------- */
+.branch-actions{display:flex;gap:10px;flex-wrap:wrap}
+.branch-actions .btn{flex:1;min-width:150px}
+.map-note{font-size:11px;color:var(--muted);line-height:1.6;margin:14px 0 0}
+
+/* 7 · Footer ----------------------------------------------------------- */
+.footer-info{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;border-top:1px solid var(--line);margin-top:22px;padding-top:20px;font-size:12px;line-height:1.7}
+.footer-info strong{display:block;color:var(--text);margin-bottom:4px}
+.footer-info a{color:var(--green);font-weight:750}
+@media(max-width:680px){.footer-info{grid-template-columns:1fr}.toast-region{bottom:84px}}
+
+/* Lite + reduced motion ------------------------------------------------- */
+.edp-mode-lite .capsule,.edp-mode-off .capsule{animation:none}
+.edp-mode-off .hero-slide,.edp-mode-off .hero-slide.is-active{transition:none}
+.edp-mode-off .toast,.edp-mode-off dialog[open].product-dialog,.edp-mode-off .cart-list li{animation:none}
+@media (prefers-reduced-motion:reduce){
+  .hero-slide,.hero-slide.is-active{transition:none}
+  .capsule,.toast,dialog[open].product-dialog,.cart-list li,.skeleton::after,.status-pill.is-bump{animation:none!important}
+  .hero-capsule{translate:none}
+}
+
+/* 8 · Header fit: the original showed 7 links + button in one row, which overflowed
+      between ~681px and ~1080px. Below 1080px the links move into the menu. */
+@media(max-width:1080px){
+  .menu-btn{display:grid}
+  .navlinks{display:none;position:absolute;top:76px;left:0;right:0;background:var(--surface);border-bottom:1px solid var(--line);padding:14px 22px 18px;flex-direction:column;align-items:flex-start;gap:0;box-shadow:0 18px 30px -20px rgba(0,0,0,.3)}
+  .navlinks.open{display:flex;animation:edp-menu .24s var(--edp-ease,ease)}
+  .navlinks a{width:100%;padding:12px 0;font-size:14px}
+  .navlinks.open a{animation:edp-menu-item .3s var(--edp-ease,ease) backwards}
+  .navlinks.open a:nth-child(2){animation-delay:.03s}.navlinks.open a:nth-child(3){animation-delay:.06s}.navlinks.open a:nth-child(4){animation-delay:.09s}.navlinks.open a:nth-child(5){animation-delay:.12s}.navlinks.open a:nth-child(6){animation-delay:.15s}.navlinks.open a:nth-child(7){animation-delay:.18s}
+}
+@media(max-width:680px){.navlinks{top:68px}}
+
+/* 9 · Small screens: keep the photo, caption and controls clear of the info cards */
+@media(max-width:680px){
+  .hero-art .fc-two{display:none}
+  .hero-art .floating-card{padding:10px 12px;font-size:11px}
+  .hero-art .fc-one{top:14px;left:12px;max-width:62%}
+  .hero-art .floating-card small{display:none}
+}
